@@ -1,8 +1,8 @@
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { redirect } from 'next/navigation';
 import { PropsWithChildren } from 'react';
+import { Toaster } from 'sonner';
 
 import './globals.css';
 
@@ -32,10 +32,13 @@ const RootLayout = async ({ children }: RootLayoutProps) => {
         },
       }}
     >
-      <html lang='en'>
+      <html lang='en' suppressHydrationWarning>
         <body className={inter.className}>
           <ThemeProvider>
-            <SocketProvider>{children}</SocketProvider>
+            <SocketProvider>
+              <Toaster richColors theme={'light'} position='bottom-right' />
+              {children}
+            </SocketProvider>
           </ThemeProvider>
         </body>
       </html>

@@ -5,19 +5,40 @@ import { useForm } from 'react-hook-form';
 
 import { Input } from '@/components/ui/input';
 import { messageSchema, type MessageFormValues } from '@/lib/types.d';
+import axios from 'axios';
+import { useTransition } from 'react';
+import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Form, FormControl, FormField, FormItem } from './ui/form';
 
-export const MessageInput = () => {
+interface MessageInputProps {
+  senderId: string;
+}
+
+export const MessageInput = ({ senderId }: MessageInputProps) => {
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<MessageFormValues>({
     resolver: zodResolver(messageSchema),
     defaultValues: { message: '' },
   });
 
-  const isLoading = form.formState.isSubmitting;
+  const isLoading = form.formState.isSubmitting || isPending;
 
-  const onSubmit = () => {
-    console.log('submit');
+  const onSubmit = ({ message }: MessageFormValues) => {
+    startTransition(async () => {
+      try {
+        const response = await axios.post('/api/socket/messages', {
+          insertMessage: message,
+          senderId,
+        });
+        toast.success(response.data);
+        form.reset();
+      } catch (err: any) {
+        console.log('SEND_MESSAGE_ERROR', err.message);
+        toast.error('Failed to send message');
+      }
+    });
   };
 
   return (

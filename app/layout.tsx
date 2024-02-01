@@ -1,7 +1,13 @@
-import { ThemeProvider } from '@/providers/theme-provider';
+import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { redirect } from 'next/navigation';
+import { PropsWithChildren } from 'react';
+
 import './globals.css';
+
+import { getSelf } from '@/lib/auth-service';
+import { ThemeProvider } from '@/providers/theme-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -10,16 +16,28 @@ export const metadata: Metadata = {
   description: 'Chat app wtih Next.js and socket.io',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+interface RootLayoutProps extends PropsWithChildren {}
+
+const RootLayout = async ({ children }: RootLayoutProps) => {
   return (
-    <html lang='en'>
-      <body className={inter.className}>
-        <ThemeProvider>{children}</ThemeProvider>
-      </body>
-    </html>
+    <ClerkProvider
+      appearance={{
+        layout: {
+          termsPageUrl: 'https://clerk.dev/terms',
+          shimmer: true,
+        },
+        variables: {
+          colorPrimary: '#000000',
+        },
+      }}
+    >
+      <html lang='en'>
+        <body className={inter.className}>
+          <ThemeProvider>{children}</ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
-}
+};
+
+export default RootLayout;

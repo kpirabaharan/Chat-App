@@ -7,6 +7,7 @@ import { PropsWithChildren } from 'react';
 import './globals.css';
 
 import { getSelf } from '@/lib/auth-service';
+import { SocketProvider } from '@/providers/socket-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -33,7 +34,9 @@ const RootLayout = async ({ children }: RootLayoutProps) => {
     >
       <html lang='en'>
         <body className={inter.className}>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <SocketProvider>{children}</SocketProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

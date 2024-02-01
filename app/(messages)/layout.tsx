@@ -9,9 +9,9 @@ const MessagesLayout = async ({ children }: MessagesLayoutProps) => {
   return (
     <>
       <Navbar />
-      <div className='flex pt-16'>
+      <div className='flex h-full pt-16'>
         <Sidebar />
-        {children}
+        <div className='h-full w-full pl-48'>{children}</div>
       </div>
     </>
   );

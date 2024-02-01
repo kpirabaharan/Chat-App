@@ -7,8 +7,8 @@
     "dev": "next dev",
     "lint": "next lint",
     "migrate": "npm run migration:generate && npm run migration:push",
-    "migration:generate": "drizzle-kit generate:pg --schema=./src/db/schema.ts",
-    "migration:push": "node -r esbuild-register ./src/db/migration.ts",
+    "migration:generate": "drizzle-kit generate:pg --schema=./db/schema.ts",
+    "migration:push": "node -r esbuild-register ./db/migration.ts",
     "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
     "start": "next start"
   },

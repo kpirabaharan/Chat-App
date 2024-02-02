@@ -1,7 +1,7 @@
 'use client';
 
 import { MessageWithUser } from '@/db/types';
-import { useMessagesSocket } from '@/hooks/use-messages-socket';
+import { useMessagesSocket } from '@/hooks/use-messages-query';
 
 interface MessageListProps {
   initialMessages: MessageWithUser[];

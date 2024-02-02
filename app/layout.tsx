@@ -6,7 +6,7 @@ import { Toaster } from 'sonner';
 
 import './globals.css';
 
-import { getSelf } from '@/lib/auth-service';
+import { QueryProvider } from '@/providers/query-provider';
 import { SocketProvider } from '@/providers/socket-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 
@@ -37,7 +37,7 @@ const RootLayout = async ({ children }: RootLayoutProps) => {
           <ThemeProvider>
             <SocketProvider>
               <Toaster richColors theme={'light'} position='bottom-right' />
-              {children}
+              <QueryProvider>{children}</QueryProvider>
             </SocketProvider>
           </ThemeProvider>
         </body>

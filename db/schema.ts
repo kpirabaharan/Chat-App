@@ -26,7 +26,7 @@ export const userRelations = relations(user, ({ many }) => ({
     relationName: 'conversationsReceived',
   }),
   directMessages: many(directMessage),
-  groups: many(group),
+  usersToGroups: many(usersToGroups),
   messages: many(message),
 }));
 
@@ -42,10 +42,10 @@ export const conversation = pgTable(
       .references(() => user.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  table => {
+  t => {
     return {
-      userOneIndex: index('user_one_index').on(table.userOneId),
-      userTwoIndex: index('user_two_index').on(table.userTwoId),
+      userOneIndex: index('user_one_index').on(t.userOneId),
+      userTwoIndex: index('user_two_index').on(t.userTwoId),
     };
   },
 );
@@ -74,7 +74,7 @@ export const directMessage = pgTable('direct_message', {
   conversationId: uuid('conversation_id')
     .notNull()
     .references(() => conversation.id, { onDelete: 'cascade' }),
-  profileId: uuid('profile_id')
+  userId: uuid('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -86,7 +86,7 @@ export const directMessageRelations = relations(directMessage, ({ one }) => ({
     references: [conversation.id],
   }),
   sender: one(user, {
-    fields: [directMessage.profileId],
+    fields: [directMessage.userId],
     references: [user.id],
   }),
 }));
@@ -99,32 +99,32 @@ export const group = pgTable('group', {
 
 export const groupRelations = relations(group, ({ one, many }) => ({
   messages: many(message),
-  profiles: many(user),
+  usersToGroups: many(usersToGroups),
 }));
 
-export const groupsToProfiles = pgTable(
-  'groups_to_profiles',
+export const usersToGroups = pgTable(
+  'users_to_groups',
   {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => user.id),
     groupId: uuid('group_id')
       .notNull()
       .references(() => group.id),
-    profileId: uuid('profile_id')
-      .notNull()
-      .references(() => user.id),
   },
   t => ({
-    pk: primaryKey({ columns: [t.groupId, t.profileId] }),
+    pk: primaryKey({ columns: [t.userId, t.groupId] }),
   }),
 );
 
-export const groupsToProfilesRelations = relations(groupsToProfiles, ({ one }) => ({
-  group: one(group, {
-    fields: [groupsToProfiles.groupId],
-    references: [group.id],
-  }),
+export const usersToGroupsRelations = relations(usersToGroups, ({ one }) => ({
   user: one(user, {
-    fields: [groupsToProfiles.profileId],
+    fields: [usersToGroups.userId],
     references: [user.id],
+  }),
+  group: one(group, {
+    fields: [usersToGroups.groupId],
+    references: [group.id],
   }),
 }));
 
@@ -135,7 +135,7 @@ export const message = pgTable('message', {
   groupId: uuid('group_id')
     .notNull()
     .references(() => group.id, { onDelete: 'cascade' }),
-  profileId: uuid('profile_id')
+  userId: uuid('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -147,7 +147,7 @@ export const messageRelations = relations(message, ({ one }) => ({
     references: [group.id],
   }),
   sender: one(user, {
-    fields: [message.profileId],
+    fields: [message.userId],
     references: [user.id],
   }),
 }));

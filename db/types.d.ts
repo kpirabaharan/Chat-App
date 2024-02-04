@@ -1,11 +1,22 @@
 import { InferSelectModel } from 'drizzle-orm';
 
-import { message, users } from '@/db/schema';
+import {
+  conversation,
+  directMessage,
+  group,
+  message,
+  user,
+  usersToGroups,
+} from '@/db/schema';
 
-export type User = InferSelectModel<typeof users>;
+export type Conversation = InferSelectModel<typeof conversation>;
+
+export type DirectMessage = InferSelectModel<typeof directMessage>;
+
+export type Group = InferSelectModel<typeof group>;
 
 export type Message = InferSelectModel<typeof message>;
 
-export type MessageWithUser = Message & {
-  sender: User;
-};
+export type User = InferSelectModel<typeof user>;
+
+export type UsersToGroups = InferSelectModel<typeof usersToGroups>;

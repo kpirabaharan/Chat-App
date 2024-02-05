@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import qs from 'query-string';
 import { useForm } from 'react-hook-form';
 
 import { Input } from '@/components/ui/input';
@@ -12,40 +13,49 @@ import {
 import axios from 'axios';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
-import { Button } from './ui/button';
-import { Form, FormControl, FormField, FormItem } from './ui/form';
+
+import { User } from '@/db/types';
+
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 
 interface MessageInputProps {
-  receiver: string;
+  receiver: User;
   type: MessageType;
   apiUrl: string;
   query: Record<string, any>;
 }
 
-export const MessageInput = ({ senderId }: MessageInputProps) => {
-  const [isPending, startTransition] = useTransition();
-
+export const MessageInput = ({
+  receiver,
+  type,
+  apiUrl,
+  query,
+}: MessageInputProps) => {
   const form = useForm<MessageFormValues>({
     resolver: zodResolver(messageSchema),
     defaultValues: { message: '' },
   });
 
-  const isLoading = form.formState.isSubmitting || isPending;
+  const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = ({ message }: MessageFormValues) => {
-    startTransition(async () => {
-      try {
-        const response = await axios.post('/api/socket/messages', {
-          insertMessage: message,
-          senderId,
-        });
-        toast.success(response.data);
-        form.reset();
-      } catch (err: any) {
-        console.log('SEND_MESSAGE_ERROR', err.message);
-        toast.error('Failed to send message');
-      }
-    });
+  const onSubmit = async ({ message }: MessageFormValues) => {
+    try {
+      const url = qs.stringifyUrl({
+        url: apiUrl,
+        query,
+      });
+
+      const response = await axios.post(url, {
+        insertMessage: message,
+      });
+
+      toast.success(response.data);
+      form.reset();
+    } catch (err: any) {
+      console.log('SEND_MESSAGE_ERROR', err.message);
+      toast.error('Failed to send message');
+    }
   };
 
   return (

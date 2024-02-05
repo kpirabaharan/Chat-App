@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { conversation, user } from '@/db/schema';
 import { getSelf } from '@/lib/auth-service';
 import { eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 
 interface ReqBody {
   receiverId: string;
@@ -14,7 +15,7 @@ export async function POST(req: Request) {
     const self = await getSelf();
 
     if (!self) {
-      return new NextResponse('User not found', { status: 404 });
+      return new NextResponse('User not found', { status: 401 });
     }
 
     const { receiverId }: ReqBody = await req.json();
@@ -51,6 +52,12 @@ export async function POST(req: Request) {
         receiverId: receiverId,
       })
       .returning();
+
+    if (newConversation) {
+      revalidatePath('/');
+      revalidatePath(`/direct-messages/`, 'layout');
+      revalidatePath(`/`, 'layout');
+    }
 
     return NextResponse.json(newConversation, { status: 200 });
   } catch (err: any) {

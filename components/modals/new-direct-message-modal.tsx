@@ -35,6 +35,7 @@ export const NewDirectMessageModal = ({
           receiverId,
         });
       toast.success('Conversation started');
+      setIsOpen(false);
       router.push(`/direct-messages/${newConversation.id}`);
     } catch (err: any) {
       toast.error(err.message);

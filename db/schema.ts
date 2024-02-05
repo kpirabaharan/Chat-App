@@ -58,6 +58,7 @@ export const conversation = pgTable(
   },
 );
 
+// TODO: Change receiver to recipient
 export const conversationRelations = relations(
   conversation,
   ({ one, many }) => ({

@@ -19,13 +19,13 @@ export const MessageList = ({
   paramKey,
   paramValue,
 }: MessageListProps) => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
-    useMessageQuery({
-      queryKey: groupId,
-      apiUrl,
-      paramKey,
-      paramValue,
-    });
+  // const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+  //   useMessageQuery({
+  //     queryKey: groupId,
+  //     apiUrl,
+  //     paramKey,
+  //     paramValue,
+  //   });
 
   return (
     <div className='flex flex-1 flex-col justify-center text-center'>

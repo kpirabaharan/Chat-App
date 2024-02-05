@@ -9,14 +9,22 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-export const user = pgTable('user', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  username: text('user_name').unique().notNull(),
-  imageUrl: text('image_url').notNull(),
-  externalId: text('external_id').unique().notNull(),
-  isOnline: boolean('is_online').default(false).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+export const user = pgTable(
+  'user',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    username: text('user_name').unique().notNull(),
+    imageUrl: text('image_url').notNull(),
+    externalId: text('external_id').unique().notNull(),
+    isOnline: boolean('is_online').default(false).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  t => {
+    return {
+      externalIdIndex: index('external_id_index').on(t.externalId),
+    };
+  },
+);
 
 export const userRelations = relations(user, ({ many }) => ({
   conversationsInitiated: many(conversation, {
@@ -34,18 +42,18 @@ export const conversation = pgTable(
   'conversation',
   {
     id: uuid('id').defaultRandom().primaryKey(),
-    userOneId: uuid('user_one_id')
+    initiatorId: uuid('initiator_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    userTwoId: uuid('user_two_id')
+    receiverId: uuid('receiver_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   t => {
     return {
-      userOneIndex: index('user_one_index').on(t.userOneId),
-      userTwoIndex: index('user_two_index').on(t.userTwoId),
+      userOneIndex: index('initiator_index').on(t.initiatorId),
+      userTwoIndex: index('receiver_index').on(t.receiverId),
     };
   },
 );
@@ -53,13 +61,13 @@ export const conversation = pgTable(
 export const conversationRelations = relations(
   conversation,
   ({ one, many }) => ({
-    userOne: one(user, {
-      fields: [conversation.userOneId],
+    initiator: one(user, {
+      fields: [conversation.initiatorId],
       references: [user.id],
       relationName: 'conversationsInitiated',
     }),
-    userTwo: one(user, {
-      fields: [conversation.userTwoId],
+    receiver: one(user, {
+      fields: [conversation.receiverId],
       references: [user.id],
       relationName: 'conversationsReceived',
     }),

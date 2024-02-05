@@ -9,7 +9,9 @@ export const messageSchema = z.object({
 
 export type MessageFormValues = z.infer<typeof messageSchema>;
 
-export type ParamKey = 'groupId' | 'conversationId';
+export type ParamKey = 'groupId' | 'conversationId' | null;
+
+export type MessageType = 'all' | 'group' | 'direct';
 
 export type NextApiResponseServerIO = NextApiResponse & {
   socket: Socket & { server: NetServer & { io: SocketIOServer } };

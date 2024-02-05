@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 import { Webhook } from 'svix';
 
 import { db } from '@/db';
-import { users } from '@/db/schema';
+import { user } from '@/db/schema';
 
 export const POST = async (req: Request) => {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -51,15 +51,15 @@ export const POST = async (req: Request) => {
   // Event Type
   const eventType = event.type;
 
-  // Handle the event for type users
+  // Handle the event for type user
   switch (eventType) {
     case 'user.created': {
       const externalId = event.data.id;
       const username = event.data.username!;
       const imageUrl = event.data.image_url;
 
-      const [user] = await db
-        .insert(users)
+      const [createdUser] = await db
+        .insert(user)
         .values({
           username,
           externalId,
@@ -67,7 +67,7 @@ export const POST = async (req: Request) => {
         })
         .returning();
 
-      console.log({ clerk_webhook: `[USER_CREATED]: ${user.username}` });
+      console.log({ clerk_webhook: `[USER_CREATED]: ${createdUser.username}` });
 
       break;
     }
@@ -76,25 +76,25 @@ export const POST = async (req: Request) => {
       const username = event.data.username!;
       const imageUrl = event.data.image_url;
 
-      const [user] = await db
-        .update(users)
+      const [updatedUser] = await db
+        .update(user)
         .set({ externalId, username, imageUrl })
-        .where(eq(users.externalId, externalId))
+        .where(eq(user.externalId, externalId))
         .returning();
 
-      console.log({ clerk_webhook: `[USER_UPDATED]: ${user.username}` });
+      console.log({ clerk_webhook: `[USER_UPDATED]: ${updatedUser.username}` });
 
       break;
     }
     case 'user.deleted': {
       const externalId = event.data.id!;
 
-      const [user] = await db
-        .delete(users)
-        .where(eq(users.externalId, externalId))
+      const [deletedUser] = await db
+        .delete(user)
+        .where(eq(user.externalId, externalId))
         .returning();
 
-      console.log({ clerk_webhook: `[USER_DELETED]: ${user.username}` });
+      console.log({ clerk_webhook: `[USER_DELETED]: ${deletedUser.username}` });
 
       break;
     }

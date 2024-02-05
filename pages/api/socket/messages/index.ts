@@ -2,7 +2,8 @@ import { eq } from 'drizzle-orm';
 import { NextApiRequest } from 'next';
 
 import { db } from '@/db';
-import { message, users } from '@/db/schema';
+import { message, user } from '@/db/schema';
+import { getSelfPages } from '@/lib/auth-service-pages';
 import { NextApiResponseServerIO } from '@/lib/types.d';
 
 interface ReqBody {
@@ -19,9 +20,14 @@ export default async function handler(
   }
 
   try {
-    const { senderId, insertMessage }: ReqBody = req.body;
+    // GET USER
+    const profile = await getSelfPages(req);
 
-    console.log('Here is the request body:', req.body);
+    // GET REQUEST BODY AND QUERY
+    const { senderId, insertMessage }: ReqBody = req.body;
+    const { groupId } = req.query;
+
+    console.log({ groupId, senderId, insertMessage });
 
     // VALIDATE REQUEST
     if (!senderId) {
@@ -30,26 +36,25 @@ export default async function handler(
     if (!insertMessage) {
       return res.status(400).json({ error: 'Message missing' });
     }
-
-    // VALIDATE USER
-    const sender = await db.query.users.findFirst({
-      where: eq(users.id, senderId),
-      columns: { id: true },
-    });
-
-    if (!sender) {
-      return res.status(404).json({ error: 'Sender not found' });
+    if (!groupId) {
+      return res.status(400).json({ error: 'Group Id missing' });
     }
 
+    // VALIDATE USER
+    // const sender = await db.query.user.findFirst({
+    //   where: eq(user.id, senderId),
+    //   columns: { id: true },
+    // });
+
+    // if (!sender) {
+    //   return res.status(404).json({ error: 'Sender not found' });
+    // }
+
     // INSERT MESSAGE
-    const newMessage = await db.insert(message).values({
-      userId: senderId,
-      message: insertMessage,
-    });
 
     // EMIT MESSAGE
-    const event = 'chat';
-    res.socket.server.io.emit(event, newMessage);
+    // const event = 'chat';
+    // res.socket.server.io.emit(event, newMessage);
 
     return res.status(200).json({ message: 'Message sent' });
   } catch (err) {

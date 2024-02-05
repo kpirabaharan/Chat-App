@@ -1,27 +1,35 @@
 'use client';
 
-import { MessageWithUser } from '@/db/types';
-import { useMessagesSocket } from '@/hooks/use-messages-query';
+import { useMessageQuery } from '@/hooks/use-messages-query';
+import { MessageType, ParamKey } from '@/lib/types';
 
 interface MessageListProps {
-  initialMessages: MessageWithUser[];
+  groupId: string;
+  apiUrl: string;
+  paramKey: ParamKey;
+  paramValue: string;
+  socketUrl: string;
+  type: MessageType;
+  query: Record<string, any>;
 }
 
-export const MessageList = ({ initialMessages }: MessageListProps) => {
-  const { messages } = useMessagesSocket({ initialMessages, event: 'chat' });
-
-  if (!messages)
-    return (
-      <div className='flex flex-1 flex-col items-center justify-center'>
-        <p>No Messages</p>
-      </div>
-    );
+export const MessageList = ({
+  groupId,
+  apiUrl,
+  paramKey,
+  paramValue,
+}: MessageListProps) => {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+    useMessageQuery({
+      queryKey: groupId,
+      apiUrl,
+      paramKey,
+      paramValue,
+    });
 
   return (
-    <ul className='flex flex-1 flex-col-reverse'>
-      {messages.map(message => (
-        <li key={message.id}>{message.message}</li>
-      ))}
-    </ul>
+    <div className='flex flex-1 flex-col justify-center text-center'>
+      No Messages
+    </div>
   );
 };

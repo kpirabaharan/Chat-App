@@ -10,8 +10,21 @@ const GroupMessagePage = async () => {
 
   return (
     <div className='relative mx-auto flex h-full max-w-7xl flex-col'>
-      <MessageList initialMessages={messages || []} />
-      <MessageInput senderId={self.id} />
+      <MessageList
+        apiUrl={'/api/all-messages'}
+        groupId={'all'}
+        paramKey={null}
+        paramValue=''
+        socketUrl='/api/socket/all'
+        type={'all'}
+        query={{}}
+      />
+      <MessageInput
+        receiver={self.id}
+        type={'all'}
+        apiUrl='/api/socket/direct-messages'
+        query={{}}
+      />
     </div>
   );
 };

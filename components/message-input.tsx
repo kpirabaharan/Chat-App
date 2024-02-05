@@ -4,7 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { Input } from '@/components/ui/input';
-import { messageSchema, type MessageFormValues } from '@/lib/types.d';
+import {
+  MessageType,
+  messageSchema,
+  type MessageFormValues,
+} from '@/lib/types.d';
 import axios from 'axios';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
@@ -12,7 +16,10 @@ import { Button } from './ui/button';
 import { Form, FormControl, FormField, FormItem } from './ui/form';
 
 interface MessageInputProps {
-  senderId: string;
+  receiver: string;
+  type: MessageType;
+  apiUrl: string;
+  query: Record<string, any>;
 }
 
 export const MessageInput = ({ senderId }: MessageInputProps) => {

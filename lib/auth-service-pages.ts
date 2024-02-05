@@ -1,19 +1,19 @@
-import { currentUser } from '@clerk/nextjs';
+import { getAuth } from '@clerk/nextjs/server';
 import { eq } from 'drizzle-orm';
+import { NextApiRequest } from 'next';
 
 import { db } from '@/db';
 import { user } from '@/db/schema';
-import { redirect } from 'next/navigation';
 
-export const getSelf = async () => {
-  const cu = await currentUser();
+export const getSelfPages = async (req: NextApiRequest) => {
+  const { userId } = getAuth(req);
 
-  if (!cu || !cu.username) {
+  if (!userId) {
     throw new Error('User not found');
   }
 
   const self = await db.query.user.findFirst({
-    where: eq(user.externalId, cu.id),
+    where: eq(user.externalId, userId),
   });
 
   if (!self) {

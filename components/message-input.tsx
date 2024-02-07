@@ -1,23 +1,22 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import qs from 'query-string';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
-import { Input } from '@/components/ui/input';
+import { User } from '@/db/types';
 import {
   MessageType,
   messageSchema,
   type MessageFormValues,
 } from '@/lib/types.d';
-import axios from 'axios';
-import { useTransition } from 'react';
-import { toast } from 'sonner';
-
-import { User } from '@/db/types';
 
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 interface MessageInputProps {
   receiver: User;
@@ -32,6 +31,8 @@ export const MessageInput = ({
   apiUrl,
   query,
 }: MessageInputProps) => {
+  const router = useRouter();
+
   const form = useForm<MessageFormValues>({
     resolver: zodResolver(messageSchema),
     defaultValues: { message: '' },
@@ -46,12 +47,12 @@ export const MessageInput = ({
         query,
       });
 
-      const response = await axios.post(url, {
-        insertMessage: message,
+      await axios.post(url, {
+        message,
       });
 
-      toast.success(response.data);
       form.reset();
+      router.refresh();
     } catch (err: any) {
       console.log('SEND_MESSAGE_ERROR', err.message);
       toast.error('Failed to send message');

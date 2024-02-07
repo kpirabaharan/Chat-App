@@ -4,7 +4,6 @@ import qs from 'query-string';
 
 import { ParamKey } from '@/lib/types';
 import { useSocket } from '@/providers/socket-provider';
-import { param } from 'drizzle-orm';
 
 interface MessageQueryProps {
   queryKey: string;
@@ -23,7 +22,7 @@ export const useMessageQuery = ({
 
   const fetchMessages = async ({ pageParam = undefined }) => {
     var url;
-    
+
     if (paramKey) {
       url = qs.stringifyUrl(
         {
@@ -51,7 +50,7 @@ export const useMessageQuery = ({
       initialPageParam: undefined,
       queryKey: [queryKey],
       queryFn: fetchMessages,
-      getNextPageParam: lastPage => lastPage.nextCursor,
+      getNextPageParam: lastPage => lastPage?.nextCursor,
       refetchInterval: isConnected ? false : 1000,
     });
 

@@ -20,8 +20,6 @@ export async function POST(req: Request) {
 
     const { receiverId }: ReqBody = await req.json();
 
-    console.log({ receiverId });
-
     if (!receiverId) {
       return new NextResponse('Receiver Id missing', { status: 400 });
     }

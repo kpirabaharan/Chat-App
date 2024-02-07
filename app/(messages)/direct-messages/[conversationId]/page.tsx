@@ -27,10 +27,10 @@ const DirectMessagesPage = async ({ params }: DirectMessagesPageProps) => {
 
   return (
     <div className='relative mx-auto flex h-full max-w-7xl flex-col'>
-      <p className='text-center'>{conversation.id}</p>
       <MessageList
         messageType={'direct'}
         groupName={otherUser.username}
+        currentUser={self}
         groupId={conversation.id}
         apiUrl={'/api/direct-messages'}
         paramKey={'conversationId'}

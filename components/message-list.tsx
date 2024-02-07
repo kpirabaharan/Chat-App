@@ -1,11 +1,15 @@
 'use client';
 
+import { DirectMessageWithConversationAndUser, User } from '@/db/types';
 import { useMessageQuery } from '@/hooks/use-messages-query';
 import { MessageType, ParamKey } from '@/lib/types';
+import { Fragment } from 'react';
+import { MessageItem } from './message-item';
 import { MessageWelcome } from './message-welcome';
 
 interface MessageListProps {
   groupName: string;
+  currentUser: User;
   groupId: string;
   apiUrl: string;
   paramKey: ParamKey;
@@ -17,6 +21,7 @@ interface MessageListProps {
 
 export const MessageList = ({
   groupName,
+  currentUser,
   groupId,
   apiUrl,
   paramKey,
@@ -49,18 +54,40 @@ export const MessageList = ({
     </div>;
   }
 
+  const itemsLength = data?.pages.reduce(
+    (acc, group) => acc + group.items.length,
+    0,
+  );
+
   return (
-    <div className='flex flex-1 flex-col justify-center overflow-y-auto py-4 text-center'>
-      {!hasNextPage && <div className='flex-1' />}
-      {!hasNextPage && (
+    <div className='flex flex-1 flex-col-reverse overflow-y-auto py-4 text-center'>
+      {itemsLength === 0 && (
         <MessageWelcome name={groupName} messageType={messageType} />
       )}
       {/* // TODO: Implement fetch next page */}
       <div className='flex flex-col'>
-        {data?.pages.map((group, i) => {
-          console.log(group);
-          return <div key={i}></div>;
-        })}
+        {data?.pages?.map((group, i) => (
+          <Fragment key={i}>
+            {group.items.map(
+              (
+                message: DirectMessageWithConversationAndUser,
+                index: number,
+              ) => (
+                <MessageItem
+                  key={index}
+                  id={message.id}
+                  currentUser={currentUser}
+                  sender={message.sender}
+                  content={message.content}
+                  deleted={message.deleted}
+                  createdAt={message.createdAt}
+                  socketUrl={socketUrl}
+                  socketQuery={query}
+                />
+              ),
+            )}
+          </Fragment>
+        ))}
       </div>
     </div>
   );

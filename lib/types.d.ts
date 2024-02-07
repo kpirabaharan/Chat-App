@@ -1,4 +1,3 @@
-import { Conversation, User } from '@/db/types';
 import { Server as NetServer, Socket } from 'net';
 import { NextApiResponse } from 'next';
 import { Server as SocketIOServer } from 'socket.io';
@@ -16,9 +15,4 @@ export type MessageType = 'all' | 'group' | 'direct';
 
 export type NextApiResponseServerIO = NextApiResponse & {
   socket: Socket & { server: NetServer & { io: SocketIOServer } };
-};
-
-export type ConversationWithUsers = Conversation & {
-  initiator?: User;
-  receiver?: User;
 };

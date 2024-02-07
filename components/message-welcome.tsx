@@ -13,7 +13,7 @@ export const MessageWelcome = ({ messageType, name }: MessageWelcomeProps) => {
       message = `Welcome to the group chat!`;
       break;
     case 'direct':
-      message = `This is the start of your conversation with ${name}`
+      message = `Send a message to chat with ${name}.`;
       break;
     default:
       message = 'Welcome to the public chat!';

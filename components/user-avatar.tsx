@@ -12,7 +12,7 @@ export const UserAvatar = ({ imageUrl, name, isOnline }: UserAvatarProps) => {
   return (
     <Avatar
       className={cn(
-        'cursor-pointer border border-background ring-2 h-8 w-8',
+        'h-8 w-8 cursor-pointer border border-background ring-2',
         isOnline ? 'ring-rose-600' : 'ring-gray-600',
       )}
     >

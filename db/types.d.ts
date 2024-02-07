@@ -20,3 +20,13 @@ export type Message = InferSelectModel<typeof message>;
 export type User = InferSelectModel<typeof user>;
 
 export type UsersToGroups = InferSelectModel<typeof usersToGroups>;
+
+export type ConversationWithUsers = Conversation & {
+  initiator?: User;
+  receiver?: User;
+};
+
+export type DirectMessageWithConversationAndUser = DirectMessage & {
+  conversation: Conversation;
+  sender: User;
+};

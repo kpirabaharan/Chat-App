@@ -26,7 +26,7 @@ const DirectMessagesPage = async ({ params }: DirectMessagesPageProps) => {
       : conversation.initiator;
 
   return (
-    <div className='relative mx-auto flex h-full max-w-7xl flex-col'>
+    <div className='relative flex h-full flex-col'>
       <MessageList
         messageType={'direct'}
         groupName={otherUser.username}
@@ -38,12 +38,14 @@ const DirectMessagesPage = async ({ params }: DirectMessagesPageProps) => {
         socketUrl={'/api/socket/direct-messages'}
         query={{ conversationId: conversation.id }}
       />
-      <MessageInput
-        type='direct'
-        receiver={otherUser}
-        apiUrl={'/api/socket/direct-messages'}
-        query={{ conversationId: conversation.id }}
-      />
+      <div className='mx-auto max-w-7xl w-full border rounded-xl'>
+        <MessageInput
+          type='direct'
+          receiver={otherUser}
+          apiUrl={'/api/socket/direct-messages'}
+          query={{ conversationId: conversation.id }}
+        />
+      </div>
     </div>
   );
 };

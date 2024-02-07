@@ -21,8 +21,8 @@ export const MessageWelcome = ({ messageType, name }: MessageWelcomeProps) => {
   }
 
   return (
-    <div>
-      <p className='text-lg font-semibold'>{message}</p>
+    <div className='flex h-full flex-col justify-center'>
+      <p className='text-center text-lg font-semibold'>{message}</p>
     </div>
   );
 };

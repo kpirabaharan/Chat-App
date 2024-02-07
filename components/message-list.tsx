@@ -60,12 +60,12 @@ export const MessageList = ({
   );
 
   return (
-    <div className='flex flex-1 flex-col-reverse overflow-y-auto py-4 text-center'>
+    <div className='no-scrollbar flex w-full flex-1 flex-col-reverse overflow-y-auto'>
       {itemsLength === 0 && (
         <MessageWelcome name={groupName} messageType={messageType} />
       )}
       {/* // TODO: Implement fetch next page */}
-      <div className='flex flex-col'>
+      <div className='mx-auto flex w-full max-w-7xl flex-col-reverse'>
         {data?.pages?.map((group, i) => (
           <Fragment key={i}>
             {group.items.map(
@@ -76,11 +76,12 @@ export const MessageList = ({
                 <MessageItem
                   key={index}
                   id={message.id}
+                  messageType={messageType}
                   currentUser={currentUser}
                   sender={message.sender}
                   content={message.content}
                   deleted={message.deleted}
-                  createdAt={message.createdAt}
+                  createdAt={new Date(message.createdAt)}
                   socketUrl={socketUrl}
                   socketQuery={query}
                 />

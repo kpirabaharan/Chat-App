@@ -2,7 +2,7 @@ import { db } from '@/db';
 import { directMessage } from '@/db/schema';
 import { DirectMessageWithConversationAndUser } from '@/db/types';
 import { getSelf } from '@/lib/auth-service';
-import { asc, eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 const MESSAGES_BATCH = 10;
@@ -29,14 +29,14 @@ export const GET = async (req: Request) => {
       limit: MESSAGES_BATCH,
       offset: parseInt(cursor, 10),
       with: { conversation: true, sender: true },
-      orderBy: [asc(directMessage.createdAt)],
+      orderBy: [desc(directMessage.createdAt)],
     });
   } else {
     messages = await db.query.directMessage.findMany({
       where: eq(directMessage.conversationId, conversationId),
       limit: MESSAGES_BATCH,
       with: { conversation: true, sender: true },
-      orderBy: [asc(directMessage.createdAt)],
+      orderBy: [desc(directMessage.createdAt)],
     });
   }
 

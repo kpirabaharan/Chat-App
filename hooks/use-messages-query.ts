@@ -51,7 +51,7 @@ export const useMessageQuery = ({
       queryKey: [queryKey],
       queryFn: fetchMessages,
       getNextPageParam: lastPage => lastPage?.nextCursor,
-      refetchInterval: isConnected ? false : 1000,
+      refetchInterval: 1000,
     });
 
   return {

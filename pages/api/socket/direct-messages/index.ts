@@ -48,7 +48,7 @@ export default async function handler(
     }
 
     // INSERT MESSAGE
-    const [newMessage] = await db
+    const [insertNewMessage] = await db
       .insert(directMessage)
       .values({
         conversationId: conversationId as string,
@@ -57,8 +57,20 @@ export default async function handler(
       })
       .returning();
 
+    const newMessage = await db.query.directMessage.findFirst({
+      where: eq(directMessage.id, insertNewMessage.id),
+      with: {
+        conversation: true,
+        sender: true,
+      },
+    });
+
+    if (!newMessage) {
+      return res.status(500).json({ error: 'Message coud not be sent.' });
+    }
+
     // EMIT MESSAGE
-    const event = `chat:${newMessage.conversationId}`;
+    const event = `chat:${newMessage.conversationId}:new-message`;
     res.socket.server.io.emit(event, newMessage);
 
     return res.status(200).json(newMessage);

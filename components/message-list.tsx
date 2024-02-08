@@ -2,6 +2,7 @@
 
 import { DirectMessageWithConversationAndUser, User } from '@/db/types';
 import { useMessageQuery } from '@/hooks/use-messages-query';
+import { useMessagesSocket } from '@/hooks/use-messages-socket';
 import { MessageType, ParamKey } from '@/lib/types';
 import { Fragment } from 'react';
 import { MessageItem } from './message-item';
@@ -30,6 +31,8 @@ export const MessageList = ({
   query,
   socketUrl,
 }: MessageListProps) => {
+  const addKey = `chat:${groupId}:new-message`;
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     useMessageQuery({
       queryKey: groupId,
@@ -37,8 +40,7 @@ export const MessageList = ({
       paramKey,
       paramValue,
     });
-
-  console.log({ data, fetchNextPage, hasNextPage, isFetchingNextPage, status });
+  useMessagesSocket({ queryKey: groupId, addKey, updateKey: `` });
 
   if (status === 'pending') {
     return (

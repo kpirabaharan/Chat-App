@@ -1,12 +1,16 @@
 'use client';
 
+import { Fragment, useEffect } from 'react';
+import { useIntersectionObserver } from 'usehooks-ts';
+
 import { DirectMessageWithConversationAndUser, User } from '@/db/types';
 import { useMessageQuery } from '@/hooks/use-messages-query';
 import { useMessagesSocket } from '@/hooks/use-messages-socket';
 import { MessageType, ParamKey } from '@/lib/types';
-import { Fragment } from 'react';
+
 import { MessageItem } from './message-item';
 import { MessageWelcome } from './message-welcome';
+import { Button } from './ui/button';
 
 interface MessageListProps {
   groupName: string;
@@ -31,7 +35,9 @@ export const MessageList = ({
   query,
   socketUrl,
 }: MessageListProps) => {
-  const addKey = `chat:${groupId}:new-message`;
+  const { isIntersecting, ref } = useIntersectionObserver({
+    threshold: 0.5,
+  });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     useMessageQuery({
@@ -40,7 +46,12 @@ export const MessageList = ({
       paramKey,
       paramValue,
     });
+  const addKey = `chat:${groupId}:new-message`;
   useMessagesSocket({ queryKey: groupId, addKey, updateKey: `` });
+
+  useEffect(() => {
+    console.log({ isIntersecting });
+  }, [ref, isIntersecting]);
 
   if (status === 'pending') {
     return (
@@ -62,11 +73,13 @@ export const MessageList = ({
   );
 
   return (
-    <div className='no-scrollbar flex w-full flex-1 flex-col-reverse overflow-y-auto'>
+    <div className='no-scrollbar flex w-full flex-1 flex-col items-center overflow-y-auto'>
+      <div className='flex-1' />
       {itemsLength === 0 && (
         <MessageWelcome name={groupName} messageType={messageType} />
       )}
       {/* // TODO: Implement fetch next page */}
+      {hasNextPage && <div ref={ref} />}
       <div className='mx-auto flex w-full max-w-7xl flex-col-reverse'>
         {data?.pages?.map((group, i) => (
           <Fragment key={i}>

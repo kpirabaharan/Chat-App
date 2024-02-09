@@ -22,15 +22,20 @@ export const GET = async (req: Request) => {
   }
 
   let messages: DirectMessageWithConversationAndUser[] = [];
+  let nextCursor: number | null = null;
 
   if (cursor) {
+    const offset = parseInt(cursor, 10);
     messages = await db.query.directMessage.findMany({
       where: eq(directMessage.conversationId, conversationId),
       limit: MESSAGES_BATCH,
-      offset: parseInt(cursor, 10),
+      offset,
       with: { conversation: true, sender: true },
       orderBy: [desc(directMessage.createdAt)],
     });
+
+    nextCursor =
+      messages.length === MESSAGES_BATCH ? offset + MESSAGES_BATCH : null;
   } else {
     messages = await db.query.directMessage.findMany({
       where: eq(directMessage.conversationId, conversationId),
@@ -38,13 +43,15 @@ export const GET = async (req: Request) => {
       with: { conversation: true, sender: true },
       orderBy: [desc(directMessage.createdAt)],
     });
+
+    nextCursor = MESSAGES_BATCH;
   }
 
-  let nextCursor = null;
-
-  if (messages.length === MESSAGES_BATCH) {
-    nextCursor = cursor ? cursor + MESSAGES_BATCH : MESSAGES_BATCH;
-  }
+  // if (messages.length === MESSAGES_BATCH) {
+  //   nextCursor = cursor
+  //     ? parseInt(cursor, 10) + MESSAGES_BATCH
+  //     : MESSAGES_BATCH;
+  // }
 
   return NextResponse.json({
     items: messages,

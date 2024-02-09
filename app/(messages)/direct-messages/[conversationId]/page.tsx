@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { MessageInput } from '@/components/message-input';
 import { MessageList } from '@/components/message-list';
+import { Button } from '@/components/ui/button';
 import { User } from '@/db/types';
 import { getSelf } from '@/lib/auth-service';
 import { getConversationById } from '@/lib/conversations-service';
@@ -38,7 +39,7 @@ const DirectMessagesPage = async ({ params }: DirectMessagesPageProps) => {
         socketUrl={'/api/socket/direct-messages'}
         query={{ conversationId: conversation.id }}
       />
-      <div className='mx-auto max-w-7xl w-full border rounded-xl'>
+      <div className='mx-auto w-full max-w-7xl rounded-xl border'>
         <MessageInput
           type='direct'
           receiver={otherUser}

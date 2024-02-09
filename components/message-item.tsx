@@ -43,7 +43,7 @@ export const MessageItem = ({
           isOnline={sender.isOnline}
         />
         <div className='flex max-w-screen-md flex-col items-start gap-y-1'>
-          <p className='rounded-xl bg-gray-700 p-2 text-sm'>{content}</p>
+          <p className='rounded-xl bg-gray-500 p-2 text-sm'>{content}</p>
         </div>
         <p className='text-end text-xs text-muted-foreground lg:whitespace-nowrap'>
           {timestamp}
@@ -75,14 +75,6 @@ export const MessageItem = ({
         <p className='text-xs text-muted-foreground lg:whitespace-nowrap'>
           {timestamp}
         </p>
-        <Edit2Icon
-          size={20}
-          className='my-auto shrink-0 cursor-pointer text-muted-foreground opacity-0 transition group-hover:opacity-100'
-        />
-        <Trash2Icon
-          size={20}
-          className='my-auto shrink-0 cursor-pointer text-red-700 opacity-0 transition group-hover:opacity-100'
-        />
       </div>
     </div>
   );

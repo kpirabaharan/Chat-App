@@ -32,7 +32,6 @@ export const MessageInput = ({
   query,
 }: MessageInputProps) => {
   const router = useRouter();
-
   const form = useForm<MessageFormValues>({
     resolver: zodResolver(messageSchema),
     defaultValues: { message: '' },

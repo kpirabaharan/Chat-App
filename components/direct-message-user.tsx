@@ -1,7 +1,6 @@
 import { PlusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Avatar } from './ui/avatar';
 import { UserAvatar } from './user-avatar';
 
 interface DirectMessageUserProps {

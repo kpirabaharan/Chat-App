@@ -24,6 +24,7 @@ interface MessageItemProps {
   currentUser: User;
   content: string;
   deleted: boolean;
+  edited: boolean;
   socketUrl: string;
   socketQuery: Record<string, any>;
   createdAt: Date;
@@ -36,6 +37,7 @@ export const MessageItem = ({
   currentUser,
   content,
   deleted,
+  edited,
   socketUrl,
   socketQuery,
   createdAt,
@@ -103,9 +105,18 @@ export const MessageItem = ({
                     {content}
                   </p>
                 </div>
-                <p className='text-end text-xs text-muted-foreground lg:whitespace-nowrap'>
-                  {timestamp}
-                </p>
+                <div>
+                  <p className='text-end'>
+                    {edited && (
+                      <span className='text-xs text-muted-foreground'>
+                        edited
+                      </span>
+                    )}
+                  </p>
+                  <p className='text-end text-xs text-muted-foreground lg:whitespace-nowrap'>
+                    {timestamp}
+                  </p>
+                </div>
                 {!deleted && (
                   <>
                     <Edit2Icon
@@ -178,11 +189,25 @@ export const MessageItem = ({
           {messageType !== 'direct' && (
             <p className='text-xs text-muted-foreground'>{sender.username}</p>
           )}
-          <p className='rounded-xl bg-gray-700 p-2 text-sm'>{content}</p>
+          <p
+            className={cn(
+              'rounded-xl bg-gray-700 p-2 text-sm',
+              deleted && 'italic',
+            )}
+          >
+            {content}
+          </p>
         </div>
-        <p className='text-xs text-muted-foreground lg:whitespace-nowrap'>
-          {timestamp}
-        </p>
+        <div>
+          <p className='text-start'>
+            {edited && (
+              <span className='text-xs text-muted-foreground'>edited</span>
+            )}
+          </p>
+          <p className='text-xs text-muted-foreground lg:whitespace-nowrap'>
+            {timestamp}
+          </p>
+        </div>
       </div>
     </div>
   );

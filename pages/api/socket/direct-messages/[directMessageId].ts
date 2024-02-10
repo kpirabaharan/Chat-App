@@ -66,6 +66,7 @@ export default async function handler(
         .update(directMessage)
         .set({
           deleted: true,
+          edited: false,
           content: 'Message deleted',
         })
         .where(eq(directMessage.id, messageToUpdate.id))
@@ -75,6 +76,7 @@ export default async function handler(
         .update(directMessage)
         .set({
           content: message,
+          edited: true,
         })
         .where(eq(directMessage.id, messageToUpdate.id))
         .execute();

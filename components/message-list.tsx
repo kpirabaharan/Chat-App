@@ -97,6 +97,7 @@ export const MessageList = ({
                   sender={message.sender}
                   content={message.content}
                   deleted={message.deleted}
+                  edited={message.edited}
                   createdAt={new Date(message.createdAt)}
                   socketUrl={socketUrl}
                   socketQuery={query}

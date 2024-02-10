@@ -79,6 +79,7 @@ export const conversationRelations = relations(
 export const directMessage = pgTable('direct_message', {
   id: uuid('id').defaultRandom().primaryKey(),
   content: text('content').notNull(),
+  edited: boolean('edited').default(false).notNull(),
   deleted: boolean('deleted').default(false).notNull(),
   conversationId: uuid('conversation_id')
     .notNull()

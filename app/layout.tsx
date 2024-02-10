@@ -6,6 +6,7 @@ import { Toaster } from 'sonner';
 
 import './globals.css';
 
+import { ModalProvider } from '@/providers/modal-provider';
 import { QueryProvider } from '@/providers/query-provider';
 import { SocketProvider } from '@/providers/socket-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
@@ -36,8 +37,11 @@ const RootLayout = async ({ children }: RootLayoutProps) => {
         <body className={inter.className}>
           <ThemeProvider>
             <SocketProvider>
-              <Toaster richColors theme={'light'} position='bottom-right' />
-              <QueryProvider>{children}</QueryProvider>
+              <ModalProvider />
+              <QueryProvider>
+                <Toaster richColors theme={'light'} position='bottom-right' />
+                {children}
+              </QueryProvider>
             </SocketProvider>
           </ThemeProvider>
         </body>

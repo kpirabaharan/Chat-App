@@ -47,7 +47,8 @@ export const MessageList = ({
       paramValue,
     });
   const addKey = `chat:${groupId}:new-message`;
-  useMessagesSocket({ queryKey: groupId, addKey, updateKey: `` });
+  const updateKey = `chat:${groupId}:update-message`;
+  useMessagesSocket({ queryKey: groupId, addKey, updateKey });
 
   useEffect(() => {
     console.log({ isIntersecting });

@@ -47,8 +47,40 @@ export const useMessagesSocket = ({
       });
     });
 
+    socket.on(
+      updateKey,
+      (updatedMessage: DirectMessageWithConversationAndUser) => {
+        console.log('Updated', updatedMessage);
+
+        queryClient.setQueryData([queryKey], (oldData: any) => {
+          if (!oldData || !oldData.pages || oldData.pages.length === 0) {
+            return oldData;
+          }
+
+          const newData = [...oldData.pages];
+          newData[0] = {
+            ...newData[0],
+            items: newData[0].items.map(
+              (item: DirectMessageWithConversationAndUser) => {
+                if (item.id === updatedMessage.id) {
+                  return updatedMessage;
+                }
+                return item;
+              },
+            ),
+          };
+
+          return {
+            ...oldData,
+            pages: newData,
+          };
+        });
+      },
+    );
+
     return () => {
       socket.off(addKey);
+      socket.off(updateKey);
     };
-  }, [addKey, queryClient, queryKey, socket]);
+  }, [addKey, updateKey, queryClient, queryKey, socket]);
 };

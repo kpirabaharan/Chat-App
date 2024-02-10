@@ -2,12 +2,12 @@ import { eq } from 'drizzle-orm';
 import { NextApiRequest } from 'next';
 
 import { db } from '@/db';
-import { conversation, directMessage, message, user } from '@/db/schema';
+import { conversation, directMessage } from '@/db/schema';
+import { User } from '@/db/types';
 import { getSelfPages } from '@/lib/auth-service-pages';
 import { NextApiResponseServerIO } from '@/lib/types.d';
 
 interface ReqBody {
-  senderId: string;
   message: string;
 }
 
@@ -29,7 +29,7 @@ export default async function handler(
 
     // VALIDATE REQUEST
     if (!self) {
-      return res.status(401).json({ error: 'Sender Id missing' });
+      return res.status(401).json({ error: 'Unauthorized' });
     }
     if (!message) {
       return res.status(400).json({ error: 'Message missing' });
@@ -41,10 +41,24 @@ export default async function handler(
     // VALIDATE CONVERSATION
     const existingConversation = await db.query.conversation.findFirst({
       where: eq(conversation.id, conversationId as string),
+      with: {
+        initiator: true,
+        receiver: true,
+      },
     });
 
     if (!existingConversation) {
       return res.status(404).json({ error: 'Conversation not found' });
+    }
+
+    // VALIDATE USER
+    var sender: User | null = null;
+    if (self.id === existingConversation.initiatorId) {
+      sender = existingConversation.initiator;
+    } else if (self.id === existingConversation.receiverId) {
+      sender = existingConversation.receiver;
+    } else {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
     // INSERT MESSAGE
@@ -53,7 +67,7 @@ export default async function handler(
       .values({
         conversationId: conversationId as string,
         content: message,
-        userId: self.id,
+        userId: sender.id,
       })
       .returning();
 
@@ -74,8 +88,8 @@ export default async function handler(
     res.socket.server.io.emit(event, newMessage);
 
     return res.status(200).json(newMessage);
-  } catch (err) {
-    console.log('MESSAGE ERROR:', err);
+  } catch (err: any) {
+    console.log('NEW_MESSAGE_ERROR:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }

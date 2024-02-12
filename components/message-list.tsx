@@ -1,13 +1,16 @@
 'use client';
 
-import { Fragment, useEffect } from 'react';
+import { ElementRef, Fragment, useEffect, useRef, useState } from 'react';
+import { SyncLoader } from 'react-spinners';
 import { useIntersectionObserver } from 'usehooks-ts';
 
 import { DirectMessageWithConversationAndUser, User } from '@/db/types';
-import { useMessageQuery } from '@/hooks/use-messages-query';
+import { useMessagesQuery } from '@/hooks/use-messages-query';
 import { useMessagesSocket } from '@/hooks/use-messages-socket';
 import { MessageType, ParamKey } from '@/lib/types';
 
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useMessagesScroll } from '@/hooks/use-messages-scroll';
 import { MessageItem } from './message-item';
 import { MessageWelcome } from './message-welcome';
 import { Button } from './ui/button';
@@ -35,12 +38,20 @@ export const MessageList = ({
   query,
   socketUrl,
 }: MessageListProps) => {
-  const { isIntersecting, ref } = useIntersectionObserver({
-    threshold: 0.5,
-  });
+  const scrollRef = useRef<ElementRef<'div'>>(null);
+  const [chatHeight, setChatHeight] = useState(0);
+
+  const { isIntersecting: isIntersectingTop, ref: topRef } =
+    useIntersectionObserver({
+      threshold: 0.5,
+    });
+  const { isIntersecting: isIntersectingBot, ref: botRef } =
+    useIntersectionObserver({
+      threshold: 0.5,
+    });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
-    useMessageQuery({
+    useMessagesQuery({
       queryKey: groupId,
       apiUrl,
       paramKey,
@@ -50,14 +61,37 @@ export const MessageList = ({
   const updateKey = `chat:${groupId}:update-message`;
   useMessagesSocket({ queryKey: groupId, addKey, updateKey });
 
+  const itemsLength: number =
+    data?.pages.reduce((acc, group) => acc + group.items.length, 0) ?? 0;
+
   useEffect(() => {
-    console.log({ isIntersecting });
-  }, [ref, isIntersecting]);
+    if (isIntersectingTop && hasNextPage) {
+      setChatHeight(scrollRef.current?.scrollHeight ?? 0);
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isIntersectingTop]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo(
+        0,
+        scrollRef.current.scrollHeight - chatHeight,
+      );
+    }
+  }, [chatHeight]);
+
+  const scrollHandle = () => {
+    if (scrollRef.current) {
+      console.log({ scrollHeight: scrollRef.current?.scrollHeight });
+      console.log({ scrollTop: scrollRef.current?.scrollTop });
+      console.log({ clientHeight: scrollRef.current?.clientHeight });
+    }
+  };
 
   if (status === 'pending') {
     return (
-      <div className='flex flex-1 flex-col justify-center text-center'>
-        Loading...
+      <div className='flex flex-1 flex-col items-center justify-center'>
+        <SyncLoader color={'#4F46E5'} />
       </div>
     );
   }
@@ -68,20 +102,18 @@ export const MessageList = ({
     </div>;
   }
 
-  const itemsLength = data?.pages.reduce(
-    (acc, group) => acc + group.items.length,
-    0,
-  );
-
   return (
     <div className='no-scrollbar flex w-full flex-1 flex-col items-center overflow-y-auto'>
       <div className='flex-1' />
       {itemsLength === 0 && (
         <MessageWelcome name={groupName} messageType={messageType} />
       )}
-      {/* // TODO: Implement fetch next page */}
-      {hasNextPage && <div ref={ref} />}
-      <div className='mx-auto flex w-full max-w-7xl flex-col-reverse'>
+      {isFetchingNextPage && <SyncLoader color={'#4F46E5'} />}
+      {hasNextPage && <div ref={topRef} className='h-4 w-full bg-red-600' />}
+      <div
+        ref={scrollRef}
+        className='overflow-y- mx-auto flex w-full max-w-7xl flex-col-reverse'
+      >
         {data?.pages?.map((group, i) => (
           <Fragment key={i}>
             {group.items.map(
@@ -107,6 +139,10 @@ export const MessageList = ({
           </Fragment>
         ))}
       </div>
+      <div ref={botRef} className='h-1 w-full bg-blue-600' />
+      <Button className='absolute bottom-4 left-1/2' onClick={scrollHandle}>
+        Scroll
+      </Button>
     </div>
   );
 };

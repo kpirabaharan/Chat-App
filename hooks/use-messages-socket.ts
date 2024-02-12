@@ -50,8 +50,6 @@ export const useMessagesSocket = ({
     socket.on(
       updateKey,
       (updatedMessage: DirectMessageWithConversationAndUser) => {
-        console.log('Updated', updatedMessage);
-
         queryClient.setQueryData([queryKey], (oldData: any) => {
           if (!oldData || !oldData.pages || oldData.pages.length === 0) {
             return oldData;

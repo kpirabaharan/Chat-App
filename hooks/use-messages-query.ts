@@ -12,7 +12,7 @@ interface MessageQueryProps {
   paramValue: string;
 }
 
-export const useMessageQuery = ({
+export const useMessagesQuery = ({
   queryKey,
   apiUrl,
   paramKey,
@@ -51,7 +51,7 @@ export const useMessageQuery = ({
       queryKey: [queryKey],
       queryFn: fetchMessages,
       getNextPageParam: lastPage => lastPage?.nextCursor,
-      refetchInterval: isConnected ? false : 1000,
+      refetchInterval: isConnected ? 10000 : 1000,
     });
 
   return {
